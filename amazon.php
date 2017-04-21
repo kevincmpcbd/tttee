@@ -9,11 +9,12 @@ timeLogStart($tStart);
 $iDAmz = new IDAmz();
 
 //Run seprate function
-// $iDAmz->scan_files('data/amz-list.txt');
+// $iDAmz->scan_data('data/amz-list.txt');
 // $iDAmz->handle_data();
 
 //Or just one
-$iDAmz->run('data/amz-list.txt');
+//$iDAmz->run('data/amz-list.txt');
+$iDAmz->run();
 
 timeLogEnd($tStart);
 echo '<br/> DONE!!!';

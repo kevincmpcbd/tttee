@@ -11,10 +11,30 @@ class ImageDownload
 
 	public $log_file;
 
-	public function run($file_path)
+	public $files_list = [];
+
+	public function run($file_path='')
 	{
-		$this->scan_files($file_path);
-		$this->handle_data();
+		if (!empty($file_path)) //With determined file
+		{
+			$this->scan_data($file_path);
+			$this->handle_data();
+		}
+		else //List of files from "/data/files_list.txt"
+		{
+			$this->scan_files_list();
+			
+			if (empty($this->files_list))
+			{
+				return FALSE;
+			}
+
+			foreach ($this->files_list as $file)
+			{
+				$this->scan_data(DIR_DATA . $file);
+				$this->handle_data();
+			}
+		}
 	}
 
 	public function get_tee_content($url)
@@ -37,7 +57,28 @@ class ImageDownload
 		return $file;
 	}
 
-	function scan_files($file_name)
+	public function scan_files_list()
+	{
+		//Get file log name
+		$handle = fopen(LIST_FILES_PATH, "r");
+		if ($handle) 
+		{
+			while (($line = fgets($handle)) !== false) 
+			{
+		        // process the line read.
+		        if (!preg_match('/^#/', $line))//file name is first line
+		        {
+		        	$this->files_list[] = trim($line);
+		        }
+		        
+		    }
+
+		    fclose($handle);
+		}
+
+	}
+
+	public function scan_data($file_name)
 	{
 		//Get file log name
 		$handle = fopen($file_name, "r");
@@ -112,7 +153,7 @@ class ImageDownload
 		    'method'=>"GET",
 		    'header'=>"Accept-language: en\r\n" .
 		              "Cookie: foo=bar\r\n" .  // check function.stream-context-create on php.net
-        		      "User-Agent: Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-22 20:23:10\r\n" // i.e. An iPad 
+        		      "User-Agent: Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-23 20:23:10\r\n" // i.e. An iPad 
  
 		  )
 		);

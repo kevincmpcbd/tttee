@@ -68,7 +68,11 @@ class ImageDownload
 		        // process the line read.
 		        if (!preg_match('/^#/', $line))//file name is first line
 		        {
-		        	$this->files_list[] = trim($line);
+		        	if ((get_class($this) == 'IDEbay' && preg_match('/^ebay/', $line)) 
+		        		|| (get_class($this) == 'IDAmz' && preg_match('/^amz/', $line)))  
+		        	{
+		        		$this->files_list[] = trim($line);
+		        	}
 		        }
 		        
 		    }

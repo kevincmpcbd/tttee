@@ -14,7 +14,9 @@ $iDAmz = new IDAmz();
 
 //Or just one
 //$iDAmz->run('data/amz-list.txt');
-$iDAmz->run();
+// $iDAmz->run('data/amz-list-18.txt');
+// $iDAmz->run();
+$iDAmz->run('data/2ao.txt');
 
 timeLogEnd($tStart);
 echo '<br/> DONE!!!';

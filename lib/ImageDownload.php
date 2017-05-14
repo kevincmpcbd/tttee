@@ -7,6 +7,12 @@ include_once 'lib/Config.php';
 **/
 class ImageDownload 
 {
+	public $category = '';
+
+	public $keywords = '';
+
+	public $output_template = '';
+
 	public $data = [];
 
 	public $log_file;
@@ -120,7 +126,11 @@ class ImageDownload
 			
 		    while (($line = fgets($handle)) !== false) {
 		        // process the line read.
-				$this->data[] = $this->parse_content($line);	
+		        $parse_content = $this->parse_content($line);
+		        if (!empty($parse_content))
+		        {
+		        	$this->data[] = $parse_content;	
+		        }
 		        
 		    }
 
@@ -185,19 +195,35 @@ class ImageDownload
         $i = 1;
 		foreach ($this->data as $row)
 		{
+			echo "<br/><br/>#{$i}<br/>";
 			pr($row);
 
 			$file_index = $i;
 			$this->download_img($row['img'], $this->log_file, $file_index);
 
-			fwrite($handle, "#{$i}-");
-			fwrite($handle, "{$row['origin']}\n");
-			fwrite($handle, "\t{$row['productTitle']}\n");
-			fwrite($handle, "\t{$file_index}\n");
-			fwrite($handle, "\t{$row['rank1']}\n");
-			fwrite($handle, "\t{$row['rank2']}\n\n");
+			//out put file list of t-shirts for uploading
 
-			fwrite($handle, "\t{$row['description']}\n\n\n");
+			if (!empty($this->output_template))
+			{
+				//Image Name; ; ;Title;Category;Description;Keyword;5
+				//$output_template = '%s; ; ;%s;%s;%s;%s;0';
+				$content_to_write = sprintf($this->output_template, "{$i}.png", $row['productTitle'], $this->category, $row['description'], $this->keywords);
+				
+				fwrite($handle, "{$content_to_write}\n");
+			}
+			else
+			{
+				fwrite($handle, "#{$i}-");
+				fwrite($handle, "{$row['origin']}\n");
+				fwrite($handle, "\t{$row['productTitle']}\n");
+				fwrite($handle, "\t{$file_index}\n");
+				fwrite($handle, "\t{$row['rank1']}\n");
+				fwrite($handle, "\t{$row['rank2']}\n\n");
+
+				fwrite($handle, "\t{$row['description']}\n\n\n");
+			}
+
+			
 
 			$i ++;
 		}
@@ -209,7 +235,8 @@ class ImageDownload
 		$img_url = trim($img_url);
 		$sub = preg_replace('/\..+?$/', '', $this->log_file);
 
-		preg_match_all('/([^\/]+)$/', $img_url, $parts);
+		$img_name = preg_replace('/\?.+/', '', $img_url);
+		preg_match_all('/([^\/]+)$/', $img_name, $parts);
 		
 		if (!empty($sub_folder))
 		{
@@ -226,6 +253,9 @@ class ImageDownload
 		if (!file_exists($dir)) {
             mkdir($dir, 0777, true);
         }
-        @file_put_contents($img, file_get_contents($img_url));
+
+        $download_rs = file_put_contents($img, file_get_contents($img_url));
+
+        var_dump($download_rs);
 	}
 }

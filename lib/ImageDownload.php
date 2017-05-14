@@ -7,6 +7,8 @@ include_once 'lib/Config.php';
 **/
 class ImageDownload 
 {
+	public $ext = '';
+
 	public $category = '';
 
 	public $keywords = '';
@@ -235,19 +237,22 @@ class ImageDownload
 		$img_url = trim($img_url);
 		$sub = preg_replace('/\..+?$/', '', $this->log_file);
 
-		$img_name = preg_replace('/\?.+/', '', $img_url);
-		preg_match_all('/([^\/]+)$/', $img_name, $parts);
-		
+		if (empty($this->ext))
+		{
+			$img_name = preg_replace('/\?.+/', '', $img_url);
+			preg_match_all('/([^\/]+)$/', $img_name, $parts);
+			$this->ext = preg_replace('/^.*\.([^.]+)$/D', '$1', $parts[0][0]);
+		}
+
 		if (!empty($sub_folder))
 		{
 			$sub_folder = $sub_folder . '\\';
 		}
 
 		// $img = "download\\{$sub_folder}" . $parts[0][0];
-
-		$ext = preg_replace('/^.*\.([^.]+)$/D', '$1', $parts[0][0]);
-		$img = DIR_IMG . date('Ymd') . "/{$sub_folder}/{$file_index}." . $ext;
-		$file_index = "{$file_index}." . $ext;
+		
+		$img = DIR_IMG . date('Ymd') . "/{$sub_folder}/{$file_index}." . $this->ext;
+		$file_index = "{$file_index}." . $this->ext;
 
 		$dir = DIR_IMG . date('Ymd') . "/{$sub_folder}" ;
 		if (!file_exists($dir)) {

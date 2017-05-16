@@ -21,6 +21,8 @@ class ImageDownload
 
 	public $files_list = [];
 
+	public $file_name_is_title = false;
+
 	public function run($file_path='')
 	{
 		if (!empty($file_path)) //With determined file
@@ -201,6 +203,14 @@ class ImageDownload
 			pr($row);
 
 			$file_index = $i;
+
+			if ($this->file_name_is_title)
+			{
+				$file_index = preg_replace('/[^A-Za-z0-9\-\s\'\+]/', '', $row['productTitle']);
+				$file_index = str_replace('+', ' ', $file_index);
+				// $file_index = $row['productTitle'];
+			}
+
 			$this->download_img($row['img'], $this->log_file, $file_index);
 
 			//out put file list of t-shirts for uploading
